@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import * as argon from 'argon2';
-import { UserDto, UserForRegistration } from './dto';
+import { LoginDto, UserDto, UserForRegistration } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
 
@@ -37,6 +42,28 @@ export class AuthService {
         }
       }
     }
+  }
+
+  async verifyUser(dto: LoginDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    if (!user) throw new NotFoundException('user does not exist');
+    const matches = await argon.verify(user.password, dto.password);
+    if (!matches)
+      throw new UnauthorizedException('password and email do not match');
+
+    const token = await this.signToken(user.id, user.email);
+    const userReturned: UserDto = {
+      email: user.email,
+      token: token,
+      username: user.username,
+      bio: user.bio,
+      image: user.image,
+    };
+    return userReturned;
   }
 
   async signToken(userId: string, email: string): Promise<string> {
