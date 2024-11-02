@@ -9,12 +9,14 @@ import * as argon from 'argon2';
 import { LoginDto, UserDto, UserForRegistration } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
+    private config: ConfigService,
   ) {}
 
   async createUser(dto: UserForRegistration) {
@@ -72,7 +74,7 @@ export class AuthService {
       email: email,
     };
 
-    const SECRET = process.env.SECRET;
+    const SECRET = this.config.get('SECRET');
     const token = await this.jwt.signAsync(data, {
       secret: SECRET,
       expiresIn: '5h',
