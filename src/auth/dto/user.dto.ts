@@ -16,3 +16,10 @@ export interface LoginDto {
   email: string;
   password: string;
 }
+
+export interface UserForUpdate {
+  email?: string;
+  username?: string;
+  bio?: string;
+  image?: string;
+}
