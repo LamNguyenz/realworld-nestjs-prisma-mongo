@@ -14,10 +14,14 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  email    String  @unique
-  username String  @unique
-  password String
-  bio      String?
-  image    String?
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  username     String   @unique
+  password     String
+  bio          String?
+  image        String?
+  followers    User[]   @relation("authorFollowers", fields: [followersIds], references: [id])
+  followersIds String[] @db.ObjectId
+  following    User[]   @relation("authorFollowers", fields: [followingIds], references: [id])
+  followingIds String[] @db.ObjectId
 }
