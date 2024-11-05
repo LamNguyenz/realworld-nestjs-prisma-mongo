@@ -21,11 +21,12 @@ To start a mongod process as a replication set look [here](https://docs.mongodb.
 ## Installation
 
 ```bash
-$ npm install
+$ pnpm install
 ```
-start the mongod process (if it's not running as a windows service)
+start the mongo replica process (if it's not running as a windows service)
 ```bash
-mongod --replSet rs0
+chmod +x ./mongo.sh
+./mongo.sh
 ```
 generate prisma types and push schema to mongod database
 ```bash
@@ -35,31 +36,27 @@ prisma db push
 ```
 
 ## Running the app
-start the mongod process (if it's not running as a windows service)
-```bash
-mongod --replSet rs0
-```
 In a different console
 ```bash
 # development
-$ npm run start
+$ pnpm run start
 
 # watch mode
-$ npm run start:dev
+$ pnpm run start:dev
 
 # production mode
-$ npm run start:prod
+$ pnpm run start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
+$ pnpm run test
 
 # e2e tests
-$ npm run test:e2e
+$ pnpm run test:e2e
 
 # test coverage
-$ npm run test:cov
+$ pnpm run test:cov
 ```
