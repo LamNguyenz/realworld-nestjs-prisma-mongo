@@ -6,6 +6,7 @@ import { PrismaModule } from 'prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProfilesModule } from './profiles/profiles.module';
+import { ArticlesModule } from './articles/articles.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProfilesModule } from './profiles/profiles.module';
       isGlobal: true,
     }),
     ProfilesModule,
+    ArticlesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
