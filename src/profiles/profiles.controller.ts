@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -28,5 +29,13 @@ export class ProfilesController {
   @Post(':username/follow')
   async followUser(@GetUser() user: User, @Param('username') username: string) {
     return { profile: await this.profileService.followUser(user, username) };
+  }
+
+  @Delete(':username/follow')
+  async unfollowUser(
+    @GetUser() user: User,
+    @Param('username') username: string,
+  ) {
+    return { profile: await this.profileService.unfollowUser(user, username) };
   }
 }

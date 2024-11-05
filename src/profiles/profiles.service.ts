@@ -34,4 +34,19 @@ export class ProfilesService {
     const profile: ProfileDto = castToProfile(userFollowed, true);
     return profile;
   }
+
+  async unfollowUser(user: User, userName: string) {
+    const userUnfollowed = await this.prisma.user.update({
+      where: {
+        username: userName,
+      },
+      data: {
+        followers: {
+          disconnect: [{ id: user.id }],
+        },
+      },
+    });
+    const profile: ProfileDto = castToProfile(userUnfollowed, false);
+    return profile;
+  }
 }
