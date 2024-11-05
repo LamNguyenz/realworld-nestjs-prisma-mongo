@@ -4,7 +4,7 @@ export interface ProfileDto {
   username: string;
   bio: string;
   image: string;
-  isFollowing: boolean;
+  following: boolean;
 }
 
 export function castToProfile(user: User, isFollowing: boolean) {

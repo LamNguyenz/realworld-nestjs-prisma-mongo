@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { castToProfile } from './dto';
+import { castToProfile, ProfileDto } from './dto';
 
 @Injectable()
 export class ProfilesService {
@@ -17,6 +17,21 @@ export class ProfilesService {
 
     const isFollowing = userFromDb.followingIds.includes(user.id);
     const profile = castToProfile(user, isFollowing);
+    return profile;
+  }
+
+  async followUser(user: User, userName: string) {
+    const userFollowed = await this.prisma.user.update({
+      where: {
+        username: userName,
+      },
+      data: {
+        followers: {
+          set: [{ username: user.username }],
+        },
+      },
+    });
+    const profile: ProfileDto = castToProfile(userFollowed, true);
     return profile;
   }
 }
