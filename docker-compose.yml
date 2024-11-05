@@ -1,14 +1,15 @@
+name: mongo-replica
 version: '3.8'
 
 services:
   mongo1:
     image: mongo:latest
     container_name: mongo1
-    command: ["--replSet", "rs0", "--bind_ip_all"]
+    command: ['--replSet', 'rs0', '--bind_ip_all']
     ports:
-      - "27017:27017"
+      - '27017:27017'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     volumes:
       - mongo1_data:/data/db
     restart: always
@@ -16,11 +17,11 @@ services:
   mongo2:
     image: mongo:latest
     container_name: mongo2
-    command: ["--replSet", "rs0", "--bind_ip_all"]
+    command: ['--replSet', 'rs0', '--bind_ip_all']
     ports:
-      - "27018:27017"
+      - '27018:27017'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     volumes:
       - mongo2_data:/data/db
     restart: always
@@ -28,11 +29,11 @@ services:
   mongo3:
     image: mongo:latest
     container_name: mongo3
-    command: ["--replSet", "rs0", "--bind_ip_all"]
+    command: ['--replSet', 'rs0', '--bind_ip_all']
     ports:
-      - "27019:27017"
+      - '27019:27017'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     volumes:
       - mongo3_data:/data/db
     restart: always
