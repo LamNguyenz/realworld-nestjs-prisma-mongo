@@ -1,3 +1,4 @@
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export interface UserDto {
   email: string;
   token: string;
@@ -6,15 +7,28 @@ export interface UserDto {
   image?: string;
 }
 
-export interface UserForRegistration {
-  email: string;
-  password: string;
-  username: string;
+export class UserForRegistration {
+  @IsEmail()
+  @IsNotEmpty()
+  readonly email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly username: string;
 }
 
-export interface LoginDto {
-  email: string;
-  password: string;
+export class LoginDto {
+  @IsEmail()
+  @IsNotEmpty()
+  readonly email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly password: string;
 }
 
 export interface UserForUpdate {

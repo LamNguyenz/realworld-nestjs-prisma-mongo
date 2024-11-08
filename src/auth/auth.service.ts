@@ -20,6 +20,17 @@ export class AuthService {
   ) {}
 
   async createUser(dto: UserForRegistration) {
+    const exitingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: dto.email }, { username: dto.username }],
+      },
+    });
+
+    if (exitingUser)
+      throw new BadRequestException(
+        `${exitingUser.email === dto.email ? 'email' : 'username'} is taken`,
+      );
+
     const hashedPassword = await argon.hash(dto.password);
     try {
       const user = await this.prisma.user.create({

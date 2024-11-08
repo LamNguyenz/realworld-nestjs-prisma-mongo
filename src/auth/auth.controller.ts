@@ -5,6 +5,7 @@ import { LoginDto, UserForRegistration } from './dto';
 @Controller('users')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
   @Post('login')
   async loginUser(@Body('user') dto: LoginDto) {
     const user = await this.authService.verifyUser(dto);
