@@ -4,6 +4,7 @@ import { GetOptionalUser } from 'src/common/decorator/get-optional-user.decorato
 import { GetUser } from 'src/common/decorator/get-user-decorator';
 import { JwtGuard } from 'src/common/guard';
 import { ArticlesService } from './articles.service';
+import { ArticleForCreateDto } from './dto';
 import { GetArticlesQueryDto } from './dto/article.dto';
 
 @Controller('articles')
@@ -11,7 +12,10 @@ export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
   @UseGuards(JwtGuard)
   @Post()
-  async createArticle(@GetUser() user: User, @Body('article') dto) {
+  async createArticle(
+    @GetUser() user: User,
+    @Body('article') dto: ArticleForCreateDto,
+  ) {
     return {
       article: await this.articlesService.createArticle(user, dto),
     };

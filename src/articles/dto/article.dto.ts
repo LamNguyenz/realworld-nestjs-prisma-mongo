@@ -1,12 +1,24 @@
 import { Article, User } from '@prisma/client';
 import { Type } from "class-transformer";
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ProfileDto } from 'src/profiles/dto';
 
-export interface ArticleForCreateDto {
+export class ArticleForCreateDto {
+  @IsString()
+  @IsNotEmpty()
   title: string;
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
+
+  @IsString()
+  @IsNotEmpty()
   body: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   tagList?: string[];
 }
 
