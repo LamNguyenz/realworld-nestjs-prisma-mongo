@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -13,7 +14,7 @@ import { GetUser } from 'src/common/decorator/get-user-decorator';
 import { JwtGuard } from 'src/common/guard';
 import { ArticlesService } from './articles.service';
 import { ArticleForCreateDto } from './dto';
-import { GetArticlesQueryDto } from './dto/article.dto';
+import { ArticleForUpdateDto, GetArticlesQueryDto } from './dto/article.dto';
 
 @Controller('articles')
 export class ArticlesController {
@@ -40,6 +41,18 @@ export class ArticlesController {
   ) {
     return {
       article: await this.articlesService.createArticle(user, dto),
+    };
+  }
+
+  @UseGuards(JwtGuard)
+  @Put(':slug')
+  async updateArticle(
+    @GetUser() user: User,
+    @Param('slug') slug: string,
+    @Body('article') dto: ArticleForUpdateDto,
+  ) {
+    return {
+      article: await this.articlesService.updateArticle(user, slug, dto),
     };
   }
 }
