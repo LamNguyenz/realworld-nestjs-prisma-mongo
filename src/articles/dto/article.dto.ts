@@ -1,6 +1,12 @@
 import { Article, User } from '@prisma/client';
-import { Type } from "class-transformer";
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ProfileDto } from 'src/profiles/dto';
 
 export class ArticleForCreateDto {
@@ -20,6 +26,20 @@ export class ArticleForCreateDto {
   @IsArray()
   @IsString({ each: true })
   tagList?: string[];
+}
+
+export class ArticleForUpdateDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  body?: string;
 }
 
 export interface ArticleDto {

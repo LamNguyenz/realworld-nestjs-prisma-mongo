@@ -5,8 +5,16 @@ import {
 } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { ArticleForCreateDto, castToArticle, GetArticlesQueryDto } from './dto';
-import { PrismaClientValidationError } from '@prisma/client/runtime/library';
+import {
+  ArticleForCreateDto,
+  ArticleForUpdateDto,
+  castToArticle,
+  GetArticlesQueryDto,
+} from './dto';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime/library';
 import { castToProfile } from 'src/profiles/dto';
 
 @Injectable()
@@ -103,5 +111,41 @@ export class ArticlesService {
         throw new BadRequestException('Bad request');
       }
     }
+  }
+
+  async updateArticle(
+    user: User,
+    slug: string,
+    articleToUpdate: ArticleForUpdateDto,
+  ) {
+    const existingArticle = await this.prisma.article.findUnique({
+      where: {
+        slug,
+        authorId: user.id,
+      },
+    });
+
+    if (existingArticle === null) {
+      throw new NotFoundException('article not found');
+    }
+
+    const newSlug = articleToUpdate.title.split(' ').join('-');
+
+    const article = await this.prisma.article.update({
+      where: {
+        id: existingArticle.id,
+      },
+      data: { ...articleToUpdate, slug: newSlug },
+      include: {
+        author: true,
+      },
+    });
+
+    return castToArticle(
+      article,
+      user,
+      article.tagList,
+      castToProfile(article.author, false),
+    );
   }
 }
