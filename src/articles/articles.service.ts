@@ -42,6 +42,7 @@ export class ArticlesService {
           createdAt: true,
           updatedAt: true,
           authorId: true,
+          author: true,
         },
         take: limit,
         skip: offset,
