@@ -1,4 +1,6 @@
 import { Article, User } from '@prisma/client';
+import { Type } from "class-transformer";
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ProfileDto } from 'src/profiles/dto';
 
 export interface ArticleForCreateDto {
@@ -35,4 +37,28 @@ export function castToArticle(
     updatedAt: article.updatedAt,
     author,
   };
+}
+
+export class GetArticlesQueryDto {
+  @IsOptional()
+  @IsString()
+  tag?: string;
+
+  @IsOptional()
+  @IsString()
+  author?: string;
+
+  @IsOptional()
+  @IsString()
+  favorited?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  limit?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  offset?: number;
 }

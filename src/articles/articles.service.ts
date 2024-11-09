@@ -1,24 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { ArticleForCreateDto, castToArticle } from './dto';
+import { ArticleForCreateDto, castToArticle, GetArticlesQueryDto } from './dto';
 import { PrismaClientValidationError } from '@prisma/client/runtime/library';
-import { castToProfile, ProfileDto } from 'src/profiles/dto';
+import { castToProfile } from 'src/profiles/dto';
 
 @Injectable()
 export class ArticlesService {
   constructor(private prisma: PrismaService) {}
 
-  async getArticles(
-    user: User,
-    query?: {
-      tag?: string;
-      author?: string;
-      favorited?: string;
-      limit?: number;
-      offset?: number;
-    },
-  ) {
+  async getArticles(user: User, query?: GetArticlesQueryDto) {
     const { tag, author, favorited, limit = 10, offset = 0 } = query;
     const queryArgs: Prisma.ArticleFindManyArgs = {
       where: {
@@ -47,12 +38,9 @@ export class ArticlesService {
     const articlesDto = articles.map((article) => {
       const following =
         article.author?.followersIds.includes(user?.id || '') || false;
-      let authorProfile: ProfileDto;
-      if (!article.author) {
-        authorProfile = null;
-      } else {
-        authorProfile = castToProfile(article.author, following);
-      }
+      const authorProfile = article.author
+        ? castToProfile(article.author, following)
+        : null;
       return castToArticle(article, user, article.tagList, authorProfile);
     });
     return { articles: articlesDto, articlesCount };
