@@ -121,10 +121,13 @@ export class ArticlesService {
     const existingArticle = await this.prisma.article.findUnique({
       where: {
         slug,
+        authorId: user.id,
       },
     });
-    if (existingArticle === null)
+
+    if (existingArticle === null) {
       throw new NotFoundException('article not found');
+    }
 
     const newSlug = articleToUpdate.title.split(' ').join('-');
 
