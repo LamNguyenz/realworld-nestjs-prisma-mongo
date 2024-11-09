@@ -26,7 +26,7 @@ export interface ArticleDto {
   slug: string;
   title: string;
   description: string;
-  bofy: string;
+  body: string;
   tagList: string[];
   author: ProfileDto;
   createdAt: Date;

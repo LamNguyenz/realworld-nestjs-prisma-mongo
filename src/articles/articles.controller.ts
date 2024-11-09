@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetOptionalUser } from 'src/common/decorator/get-optional-user.decorator';
 import { GetUser } from 'src/common/decorator/get-user-decorator';
@@ -10,6 +18,20 @@ import { GetArticlesQueryDto } from './dto/article.dto';
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
+
+  @Get()
+  async getArticles(
+    @GetOptionalUser() user: User,
+    @Query() query: GetArticlesQueryDto,
+  ) {
+    return await this.articlesService.getArticles(user, query);
+  }
+
+  @Get(':slug')
+  async getArticle(@GetOptionalUser() user: User, @Param('slug') slug: string) {
+    return { article: await this.articlesService.findArticle(user, slug) };
+  }
+
   @UseGuards(JwtGuard)
   @Post()
   async createArticle(
@@ -19,13 +41,5 @@ export class ArticlesController {
     return {
       article: await this.articlesService.createArticle(user, dto),
     };
-  }
-
-  @Get()
-  async getArticles(
-    @GetOptionalUser() user: User,
-    @Query() query: GetArticlesQueryDto,
-  ) {
-    return await this.articlesService.getArticles(user, query);
   }
 }

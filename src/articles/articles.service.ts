@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { ArticleForCreateDto, castToArticle, GetArticlesQueryDto } from './dto';
@@ -21,11 +25,18 @@ export class ArticlesService {
     const [articles, articlesCount] = await Promise.all([
       this.prisma.article.findMany({
         ...queryArgs,
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          tagList: true,
+          createdAt: true,
+          updatedAt: true,
+          authorId: true,
+        },
         take: limit,
         skip: offset,
-        include: {
-          author: true,
-        },
         orderBy: {
           updatedAt: 'desc',
         },
@@ -41,9 +52,31 @@ export class ArticlesService {
       const authorProfile = article.author
         ? castToProfile(article.author, following)
         : null;
-      return castToArticle(article, user, article.tagList, authorProfile);
+      return castToArticle(
+        { ...article, body: '' },
+        user,
+        article.tagList,
+        authorProfile,
+      );
     });
     return { articles: articlesDto, articlesCount };
+  }
+
+  async findArticle(user: User, slug: string) {
+    const article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+      },
+      include: {
+        author: true,
+      },
+    });
+    if (article === null) throw new NotFoundException('article not found');
+
+    const following = article.author?.followersIds.includes(user?.id) || false;
+
+    const authorProfile = castToProfile(article.author, following);
+    return castToArticle(article, user, article.tagList, authorProfile);
   }
 
   async createArticle(user: User, articleToCreate: ArticleForCreateDto) {
