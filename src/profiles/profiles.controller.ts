@@ -4,20 +4,23 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Optional,
   Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ProfilesService } from './profiles.service';
-import { GetUser } from 'src/common/decorator/get-user-decorator';
 import { User } from '@prisma/client';
+import { GetUser } from 'src/common/decorator/get-user-decorator';
+import { Public } from 'src/common/decorator/public.decorator';
 import { JwtGuard } from 'src/common/guard';
+import { ProfilesService } from './profiles.service';
 
 @UseGuards(JwtGuard)
 @Controller('profiles')
 export class ProfilesController {
   constructor(private readonly profileService: ProfilesService) {}
 
+  @Public()
   @Get(':username')
   async findUser(@GetUser() user: User, @Param('username') username: string) {
     return {

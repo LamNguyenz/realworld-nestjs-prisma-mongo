@@ -15,9 +15,8 @@ export class ProfilesService {
     });
     if (!userFromDb) throw new NotFoundException('user not found');
 
-    const isFollowing = userFromDb.followingIds.includes(user.id);
-    const profile = castToProfile(user, isFollowing);
-    return profile;
+    const isFollowing = userFromDb.followingIds.includes(user?.id);
+    return castToProfile(userFromDb, isFollowing);
   }
 
   async followUser(user: User, userName: string) {
