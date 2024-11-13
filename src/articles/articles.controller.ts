@@ -16,6 +16,7 @@ import { JwtGuard } from 'src/common/guard';
 import { ArticlesService } from './articles.service';
 import { ArticleForCreateDto } from './dto';
 import { ArticleForUpdateDto, GetArticlesQueryDto } from './dto/article.dto';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('articles')
 export class ArticlesController {
@@ -29,8 +30,10 @@ export class ArticlesController {
     return await this.articlesService.getArticles(user, query);
   }
 
+  @UseGuards(JwtGuard)
+  @Public()
   @Get(':slug')
-  async getArticle(@GetOptionalUser() user: User, @Param('slug') slug: string) {
+  async getArticle(@GetUser() user: User, @Param('slug') slug: string) {
     return { article: await this.articlesService.findArticle(user, slug) };
   }
 
