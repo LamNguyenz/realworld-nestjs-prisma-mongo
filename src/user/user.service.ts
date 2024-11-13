@@ -10,20 +10,32 @@ export class UserService {
 
   async updateUser(user: User, dto: UserForUpdate) {
     try {
-      const userUpdated = await this.prisma.user.update({
+      // Destructure and filter out undefined values from the DTO
+      const { email, username, bio, image } = dto;
+      const updateData = { email, username, bio, image };
+
+      // Remove undefined fields from updateData
+      Object.keys(updateData).forEach(
+        (key) => updateData[key] === undefined && delete updateData[key],
+      );
+
+      // Return early if no fields to update
+      if (Object.keys(updateData).length === 0) {
+        return user;
+      }
+
+      return await this.prisma.user.update({
         where: {
           email: user.email,
         },
-        data: {
-          ...dto,
-        },
+        data: updateData,
       });
-      return userUpdated;
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new BadRequestException('email or username taken');
-        }
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BadRequestException('email or username taken');
       }
     }
   }

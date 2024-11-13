@@ -15,7 +15,7 @@ export class ProfilesService {
     });
     if (!userFromDb) throw new NotFoundException('user not found');
 
-    const isFollowing = userFromDb.followingIds.includes(user?.id);
+    const isFollowing = userFromDb.followersIds.includes(user?.id);
     return castToProfile(userFromDb, isFollowing);
   }
 

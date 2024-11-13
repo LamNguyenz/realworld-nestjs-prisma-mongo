@@ -49,10 +49,11 @@ export class AuthService {
       };
       return userToReturn;
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new BadRequestException('email is taken');
-        }
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new BadRequestException('email is taken');
       }
     }
   }
@@ -86,11 +87,9 @@ export class AuthService {
     };
 
     const SECRET = this.config.get('SECRET');
-    const token = await this.jwt.signAsync(data, {
+    return await this.jwt.signAsync(data, {
       secret: SECRET,
       expiresIn: '3d',
     });
-
-    return token;
   }
 }
