@@ -149,4 +149,22 @@ export class ArticlesService {
       castToProfile(article.author, false),
     );
   }
+
+  async deleteArticle(user: User, slug: string) {
+    const article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+        authorId: user.id,
+      },
+    });
+
+    if (article === null) throw new NotFoundException('article not found');
+
+    await this.prisma.article.delete({
+      where: {
+        id: article.id,
+      },
+    });
+    return;
+  }
 }
