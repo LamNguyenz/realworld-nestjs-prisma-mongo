@@ -14,28 +14,32 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  email        String    @unique
-  username     String    @unique
-  password     String
-  bio          String?
-  image        String?
-  followers    User[]    @relation("authorFollowers", fields: [followersIds], references: [id])
-  followersIds String[]  @db.ObjectId
-  following    User[]    @relation("authorFollowers", fields: [followingIds], references: [id])
-  followingIds String[]  @db.ObjectId
-  Article      Article[]
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  email            String    @unique
+  username         String    @unique
+  password         String
+  bio              String?
+  image            String?
+  articles         Article[]
+  followers        User[]    @relation("authorFollowers", fields: [followersIds], references: [id])
+  followersIds     String[]  @db.ObjectId
+  following        User[]    @relation("authorFollowers", fields: [followingIds], references: [id])
+  followingIds     String[]  @db.ObjectId
+  articlesLiked    Article[] @relation("likedArticles", fields: [articlesLikedIds], references: [id])
+  articlesLikedIds String[]  @db.ObjectId
 }
 
 model Article {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  slug        String   @unique
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  body        String
-  tagList     String[] @default([])
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  slug            String   @unique
+  description     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  body            String
+  tagList         String[] @default([])
+  author          User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId        String
+  favoriteUsers   User[]   @relation("likedArticles", fields: [favoriteUserIds], references: [id])
+  favoriteUserIds String[] @db.ObjectId
 }
