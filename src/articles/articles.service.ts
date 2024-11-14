@@ -132,22 +132,34 @@ export class ArticlesService {
 
     const newSlug = articleToUpdate.title.split(' ').join('-');
 
-    const article = await this.prisma.article.update({
-      where: {
-        id: existingArticle.id,
-      },
-      data: { ...articleToUpdate, slug: newSlug },
-      include: {
-        author: true,
-      },
-    });
+    try {
+      const article = await this.prisma.article.update({
+        where: {
+          id: existingArticle.id,
+        },
+        data: { ...articleToUpdate, slug: newSlug },
+        include: {
+          author: true,
+        },
+      });
 
-    return castToArticle(
-      article,
-      user,
-      article.tagList,
-      castToProfile(article.author, false),
-    );
+      return castToArticle(
+        article,
+        user,
+        article.tagList,
+        castToProfile(article.author, false),
+      );
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BadRequestException(
+          'Article with this ttitle already exists',
+        );
+      }
+      throw error;
+    }
   }
 
   async deleteArticle(user: User, slug: string) {
