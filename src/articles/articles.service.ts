@@ -14,6 +14,8 @@ import {
   ArticleForCreateDto,
   ArticleForUpdateDto,
   castToArticle,
+  castToCommentDto,
+  CommentForCreateDto,
   GetArticlesQueryDto,
 } from './dto';
 
@@ -248,5 +250,65 @@ export class ArticlesService {
       articleUpdated.tagList,
       castToProfile(articleUpdated.author, isFollowing),
     );
+  }
+
+  async addCommentToArticle(
+    user: User,
+    slug: string,
+    dto: CommentForCreateDto,
+  ) {
+    const article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+      },
+    });
+
+    if (!article) throw new NotFoundException('article not found');
+
+    const comment = await this.prisma.comment.create({
+      data: {
+        articleId: article.id,
+        authorId: user.id,
+        body: dto.body,
+      },
+    });
+    return castToCommentDto(comment, castToProfile(user, false));
+  }
+
+  async getCommentsForArticle(slug: string) {
+    const article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+      },
+      select: {
+        comments: {
+          include: {
+            author: true,
+          },
+        },
+      },
+    });
+    if (!article) throw new NotFoundException('article not found');
+    return article.comments.map((comment) => {
+      return castToCommentDto(comment, castToProfile(comment.author, false));
+    }) || [];
+  }
+
+  async deleteCommentFromArticle(id: string) {
+    try {
+      await this.prisma.comment.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('comment not found');
+      }
+      throw error;
+    }
   }
 }
