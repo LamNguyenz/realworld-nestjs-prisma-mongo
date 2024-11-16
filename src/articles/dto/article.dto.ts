@@ -68,7 +68,7 @@ export function castToArticle(
     tagList: tags,
     createdAt: article.createdAt,
     updatedAt: article.updatedAt,
-    favorited: article.favoritedUserIds.includes(user.id) || false,
+    favorited: article?.favoritedUserIds?.includes(user.id) || false,
     author,
   };
 }

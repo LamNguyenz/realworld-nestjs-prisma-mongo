@@ -14,7 +14,7 @@ import { GetOptionalUser } from 'src/common/decorator/get-optional-user.decorato
 import { GetUser } from 'src/common/decorator/get-user-decorator';
 import { JwtGuard } from 'src/common/guard';
 import { ArticlesService } from './articles.service';
-import { ArticleForCreateDto } from './dto';
+import { ArticleForCreateDto, CommentForCreateDto } from './dto';
 import { ArticleForUpdateDto, GetArticlesQueryDto } from './dto/article.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 
@@ -82,5 +82,29 @@ export class ArticlesController {
     return {
       article: await this.articlesService.unFavoriteArticle(user, slug),
     };
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':slug/comments')
+  async getCommentsForArticle(@Param('slug') slug: string) {
+    return { comments: await this.articlesService.getCommentsForArticle(slug) };
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':slug/comments')
+  async addCommentToArticle(
+    @GetUser() user: User,
+    @Param('slug') slug: string,
+    @Body('comment') dto: CommentForCreateDto,
+  ) {
+    return {
+      comment: await this.articlesService.addCommentToArticle(user, slug, dto),
+    };
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(':slug/comments/:id')
+  async deleteCommentFromArticle(@Param('id') id: string) {
+    return await this.articlesService.deleteCommentFromArticle(id);
   }
 }
