@@ -51,6 +51,7 @@ export interface ArticleDto {
   author: ProfileDto;
   createdAt: Date;
   updatedAt: Date;
+  favorited: boolean;
 }
 
 export function castToArticle(
@@ -58,7 +59,7 @@ export function castToArticle(
   user: User,
   tags: string[],
   author: ProfileDto,
-) {
+): ArticleDto {
   return {
     slug: article.slug,
     title: article.title,
@@ -67,6 +68,7 @@ export function castToArticle(
     tagList: tags,
     createdAt: article.createdAt,
     updatedAt: article.updatedAt,
+    favorited: article.favoritedUserIds.includes(user.id) || false,
     author,
   };
 }
