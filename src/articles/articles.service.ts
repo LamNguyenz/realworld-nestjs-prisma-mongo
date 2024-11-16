@@ -3,19 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User, Prisma } from '@prisma/client';
+import { Article, Prisma, User } from '@prisma/client';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime/library';
 import { PrismaService } from 'prisma/prisma.service';
+import { castToProfile } from 'src/profiles/dto';
 import {
   ArticleForCreateDto,
   ArticleForUpdateDto,
   castToArticle,
   GetArticlesQueryDto,
 } from './dto';
-import {
-  PrismaClientKnownRequestError,
-  PrismaClientValidationError,
-} from '@prisma/client/runtime/library';
-import { castToProfile } from 'src/profiles/dto';
 
 @Injectable()
 export class ArticlesService {
@@ -62,7 +62,7 @@ export class ArticlesService {
         ? castToProfile(article.author, following)
         : null;
       return castToArticle(
-        { ...article, body: '' },
+        article as unknown as Article,
         user,
         article.tagList,
         authorProfile,
@@ -178,5 +178,75 @@ export class ArticlesService {
       },
     });
     return;
+  }
+
+  async favoriteArticle(user: User, slug: string) {
+    let article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    if (!article) throw new NotFoundException('article not found');
+
+    if (!article.favoritedUserIds.includes(user.id)) {
+      article = await this.prisma.article.update({
+        where: {
+          slug,
+        },
+        data: {
+          favoritedUserIds: {
+            push: user.id,
+          },
+        },
+        include: {
+          author: true,
+        },
+      });
+    }
+
+    const following = article.author?.followersIds.includes(user.id) || false;
+    return castToArticle(
+      article,
+      user,
+      article.tagList,
+      castToProfile(article.author, following),
+    );
+  }
+
+  async unFavoriteArticle(user: User, slug: string) {
+    const article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+      },
+    });
+    if (!article) throw new NotFoundException('article not found');
+
+    const favoritedUserIds = article.favoritedUserIds.filter(
+      (id) => id !== user.id,
+    );
+
+    const articleUpdated = await this.prisma.article.update({
+      where: {
+        slug,
+      },
+      data: {
+        favoritedUserIds,
+      },
+      include: {
+        author: true,
+      },
+    });
+    const isFollowing =
+      articleUpdated.author?.followersIds.includes(user.id) || false;
+    return castToArticle(
+      articleUpdated,
+      user,
+      articleUpdated.tagList,
+      castToProfile(articleUpdated.author, isFollowing),
+    );
   }
 }

@@ -67,4 +67,20 @@ export class ArticlesController {
       article: await this.articlesService.deleteArticle(user, slug),
     };
   }
+
+  @UseGuards(JwtGuard)
+  @Post(':slug/favorite')
+  async favoriteArticle(@GetUser() user: User, @Param('slug') slug: string) {
+    return {
+      article: await this.articlesService.favoriteArticle(user, slug),
+    };
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(':slug/favorite')
+  async unFavoriteArticle(@GetUser() user: User, @Param('slug') slug: string) {
+    return {
+      article: await this.articlesService.unFavoriteArticle(user, slug),
+    };
+  }
 }

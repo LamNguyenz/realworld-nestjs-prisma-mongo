@@ -40,6 +40,6 @@ model Article {
   tagList         String[] @default([])
   author          User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId        String
-  favoriteUsers   User[]   @relation("likedArticles", fields: [favoriteUserIds], references: [id])
-  favoriteUserIds String[] @db.ObjectId
+  favoritedUsers   User[]   @relation("likedArticles", fields: [favoritedUserIds], references: [id])
+  favoritedUserIds String[] @db.ObjectId
 }
