@@ -12,11 +12,15 @@ import {
 import { User } from '@prisma/client';
 import { GetOptionalUser } from 'src/common/decorator/get-optional-user.decorator';
 import { GetUser } from 'src/common/decorator/get-user-decorator';
+import { Public } from 'src/common/decorator/public.decorator';
 import { JwtGuard } from 'src/common/guard';
 import { ArticlesService } from './articles.service';
-import { ArticleForCreateDto, CommentForCreateDto } from './dto';
-import { ArticleForUpdateDto, GetArticlesQueryDto } from './dto/article.dto';
-import { Public } from 'src/common/decorator/public.decorator';
+import {
+  ArticleForCreateDto,
+  ArticleForUpdateDto,
+  CommentForCreateDto,
+  GetArticlesQueryDto,
+} from './dto';
 
 @Controller('articles')
 export class ArticlesController {

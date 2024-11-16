@@ -96,3 +96,15 @@ export class GetArticlesQueryDto {
   @IsNumber()
   offset?: number;
 }
+
+export class GetUserFeedQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  limit?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  offset?: number;
+}
