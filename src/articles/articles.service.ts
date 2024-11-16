@@ -90,6 +90,43 @@ export class ArticlesService {
     return castToArticle(article, user, article.tagList, authorProfile);
   }
 
+  async getUserFeed(user: User, limit: number, offset: number) {
+    const queryArgs: Prisma.ArticleFindManyArgs = {
+      where: {
+        authorId: {
+          in: user.followingIds,
+        },
+      },
+    };
+
+    const [articles, articlesCount] = await Promise.all([
+      this.prisma.article.findMany({
+        ...queryArgs,
+        take: limit,
+        skip: offset,
+        include: {
+          author: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      }),
+      this.prisma.article.count({ where: queryArgs.where }),
+    ]);
+
+    return {
+      articles: articles.map((article) =>
+        castToArticle(
+          article,
+          user,
+          article.tagList,
+          castToProfile(article.author, false),
+        ),
+      ),
+      articlesCount,
+    };
+  }
+
   async createArticle(user: User, articleToCreate: ArticleForCreateDto) {
     const slug = articleToCreate.title.split(' ').join('-');
     try {
@@ -289,9 +326,11 @@ export class ArticlesService {
       },
     });
     if (!article) throw new NotFoundException('article not found');
-    return article.comments.map((comment) => {
-      return castToCommentDto(comment, castToProfile(comment.author, false));
-    }) || [];
+    return (
+      article.comments.map((comment) => {
+        return castToCommentDto(comment, castToProfile(comment.author, false));
+      }) || []
+    );
   }
 
   async deleteCommentFromArticle(id: string) {
